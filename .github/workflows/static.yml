@@ -1,15 +1,22 @@
+# 这是一个 GitHub Actions 工作流文件
+# 文件名: static.yml
+
 name: Deploy Static Site to GitHub Pages
 
+# 触发条件：当推送到 main 分支时运行
+# 注意：如果你的默认分支叫 master，请把下面的 'main' 改为 'master'
 on:
   push:
     branches:
-      - main   # 或者你的默认分支名，如 master
+      - main
 
+# 设置权限，允许 Actions 写入 Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
+# 防止并发运行，确保一次只部署一个版本
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -21,17 +28,22 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+      # 1. 检出你的代码
       - name: Checkout
         uses: actions/checkout@v4
 
+      # 2. 配置 Pages 环境
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      # 3. 上传整个项目目录作为构建产物
+      # 因为我们是纯静态网页，没有构建过程，所以直接上传根目录 '.'
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'  # 部署整个根目录，确保 index.html 在根目录
+          path: '.'
 
+      # 4. 部署到 GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
